@@ -3,11 +3,12 @@ class Borrowing < ApplicationRecord
   belongs_to :book
 
   validates :member_id, :book_id, presence: true
-  validate :book_must_be_available
-  validate :member_cannot_have_unreturned_copy
+  validate :book_must_be_available, on: :create
+  validate :member_cannot_have_unreturned_copy, on: :create
 
   scope :active, -> { where(returned_at: nil) }
   scope :returned, -> { where.not(returned_at: nil) }
+  scope :overdue, -> { where(returned_at: nil).where("due_at < ?", Time.current) }
 
   private
 

@@ -15,7 +15,14 @@ Rails.application.routes.draw do
       resources :books, only: %i[index create update destroy]
 
       # Borrowings
-      resources :borrowings, only: %i[create]
+      resources :borrowings, only: %i[create] do
+        member do
+          patch :return
+        end
+      end
+
+      # Dashboard
+      resource :dashboard, only: %i[show]
     end
   end
 end

@@ -66,6 +66,51 @@ Example:
 
 - `GET /api/v1/books?title=pragmatic`
 
+### Borrowings
+
+- `POST /api/v1/borrowings` — Borrow a book (member-only).
+- `PATCH /api/v1/borrowings/:id/return` — Mark a book as returned (librarian or the borrowing member).
+
+### Dashboard
+
+- `GET /api/v1/dashboard` — Returns role-specific dashboard data (authenticated users).
+
+**Librarian response:**
+```json
+{
+  "total_books": 10,
+  "total_borrowed": 3,
+  "due_today": 1,
+  "overdue_borrowings": [
+    {
+      "id": 1,
+      "borrowed_at": "2026-03-01T00:00:00.000Z",
+      "due_at": "2026-03-15T00:00:00.000Z",
+      "returned_at": null,
+      "book": { "id": 1, "title": "...", "author": "..." },
+      "member": { "id": 2, "name": "...", "email": "..." }
+    }
+  ]
+}
+```
+
+**Member response:**
+```json
+{
+  "borrowed": [
+    {
+      "id": 2,
+      "borrowed_at": "2026-03-20T00:00:00.000Z",
+      "due_at": "2026-04-03T00:00:00.000Z",
+      "returned_at": null,
+      "book": { "id": 3, "title": "...", "author": "..." },
+      "member": { "id": 5, "name": "...", "email": "..." }
+    }
+  ],
+  "overdue": []
+}
+```
+
 ## Auth notes
 
 - Protected endpoints require an `Authorization` header with a bearer token:

@@ -64,4 +64,53 @@ RSpec.describe "Api::V1::Borrowings", type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe "PATCH /api/v1/borrowings/:id/return" do
+    let(:borrowing) { create(:borrowing, book:, member:) }
+
+    it "marks a borrowing as returned when authenticated as librarian" do
+      patch "/api/v1/borrowings/#{borrowing.id}/return", headers: auth_headers_for(librarian)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to include(
+        "id" => borrowing.id,
+        "borrowed_at" => match(/\d{4}-\d{2}-\d{2}/),
+        "returned_at" => match(/\d{4}-\d{2}-\d{2}/)
+      )
+      expect(borrowing.reload.returned_at).not_to be_nil
+    end
+
+    it "marks a borrowing as returned when authenticated as the borrowing member" do
+      patch "/api/v1/borrowings/#{borrowing.id}/return", headers: auth_headers_for(member)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to include(
+        "id" => borrowing.id,
+        "returned_at" => match(/\d{4}-\d{2}-\d{2}/)
+      )
+      expect(borrowing.reload.returned_at).not_to be_nil
+    end
+
+    it "returns 403 when authenticated as different member" do
+      other_member = create(:member)
+
+      patch "/api/v1/borrowings/#{borrowing.id}/return", headers: auth_headers_for(other_member)
+
+      expect(response).to have_http_status(:forbidden)
+      expect(response.parsed_body["error"]).to eq("Forbidden")
+    end
+
+    it "returns 401 when unauthenticated" do
+      patch "/api/v1/borrowings/#{borrowing.id}/return"
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(response.parsed_body["error"]).to eq("Not authenticated")
+    end
+
+    it "returns 404 for non-existent borrowing" do
+      patch "/api/v1/borrowings/99999/return", headers: auth_headers_for(librarian)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

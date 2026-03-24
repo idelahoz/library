@@ -20,4 +20,10 @@ module Authorization
 
     render json: { error: "Forbidden" }, status: :forbidden
   end
+
+  def authorize_borrowing_member_or_librarian!(borrowing)
+    return if current_user&.librarian? || current_user&.id == borrowing.member_id
+
+    render json: { error: "Forbidden" }, status: :forbidden
+  end
 end
