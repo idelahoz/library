@@ -6,4 +6,21 @@ class Book < ApplicationRecord
       only_integer: true,
       greater_than: 0
     }
+
+  def self.search(filters = {})
+    title = filters[:title] || filters["title"]
+    author = filters[:author] || filters["author"]
+    genre = filters[:genre] || filters["genre"]
+
+    relation = all
+    relation = relation.where("title ILIKE ?", like_pattern(title)) if title.present?
+    relation = relation.where("author ILIKE ?", like_pattern(author)) if author.present?
+    relation = relation.where("genre ILIKE ?", like_pattern(genre)) if genre.present?
+    relation
+  end
+
+  def self.like_pattern(value)
+    "%#{sanitize_sql_like(value.to_s.strip)}%"
+  end
+  private_class_method :like_pattern
 end

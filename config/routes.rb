@@ -12,7 +12,7 @@ Rails.application.routes.draw do
       resource :me, only: %i[show], controller: :me
 
       # Books
-      resources :books, only: %i[create update destroy]
+      resources :books, only: %i[index create update destroy]
     end
   end
 end

@@ -14,6 +14,77 @@ RSpec.describe "Api::V1::Books", type: :request do
     }
   end
 
+  describe "GET /api/v1/books" do
+    let!(:pragmatic) do
+      create(:book, title: "The Pragmatic Programmer", author: "Andrew Hunt", genre: "Programming")
+    end
+    let!(:clean_code) do
+      create(:book, title: "Clean Code", author: "Robert Martin", genre: "Programming")
+    end
+    let!(:gatsby) do
+      create(:book, title: "The Great Gatsby", author: "F. Scott Fitzgerald", genre: "Classic")
+    end
+
+    it "returns all books for authenticated member" do
+      get "/api/v1/books", headers: auth_headers_for(member)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.size).to eq(3)
+      expect(response.parsed_body.map { |b| b["id"] }).to eq([pragmatic.id, clean_code.id, gatsby.id])
+    end
+
+    it "allows authenticated librarian" do
+      get "/api/v1/books", headers: auth_headers_for(librarian)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.size).to eq(3)
+    end
+
+    it "filters by title" do
+      get "/api/v1/books", params: { title: "pragmatic" }, headers: auth_headers_for(member)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.map { |b| b["id"] }).to eq([pragmatic.id])
+    end
+
+    it "filters by author" do
+      get "/api/v1/books", params: { author: "martin" }, headers: auth_headers_for(member)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.map { |b| b["id"] }).to eq([clean_code.id])
+    end
+
+    it "filters by genre" do
+      get "/api/v1/books", params: { genre: "program" }, headers: auth_headers_for(member)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.map { |b| b["id"] }).to eq([pragmatic.id, clean_code.id])
+    end
+
+    it "combines filters" do
+      get "/api/v1/books",
+        params: { author: "andrew", genre: "programming" },
+        headers: auth_headers_for(member)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.map { |b| b["id"] }).to eq([pragmatic.id])
+    end
+
+    it "returns empty list when there are no matches" do
+      get "/api/v1/books", params: { title: "non-existent" }, headers: auth_headers_for(member)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to eq([])
+    end
+
+    it "returns 401 when unauthenticated" do
+      get "/api/v1/books"
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(response.parsed_body["error"]).to eq("Not authenticated")
+    end
+  end
+
   describe "POST /api/v1/books" do
     it "creates a book when authenticated as librarian" do
       expect do

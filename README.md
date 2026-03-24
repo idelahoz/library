@@ -51,9 +51,20 @@ Base path: `/api/v1`
 
 ### Books
 
+- `GET /api/v1/books` — List/search books (authenticated users).
 - `POST /api/v1/books` — Create a book (librarian-only).
 - `PATCH /api/v1/books/:id` — Update a book (librarian-only).
 - `DELETE /api/v1/books/:id` — Delete a book (librarian-only).
+
+Search query params (optional):
+
+- `title`
+- `author`
+- `genre`
+
+Example:
+
+- `GET /api/v1/books?title=pragmatic`
 
 ## Auth notes
 
