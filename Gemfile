@@ -46,6 +46,7 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
   gem "rspec-rails", "~> 8.0"
+  gem "factory_bot_rails"
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
@@ -64,7 +65,6 @@ end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "factory_bot_rails"
   gem "capybara"
   gem "selenium-webdriver"
 end

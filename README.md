@@ -21,9 +21,23 @@ For test database:
 
 - `bin/rails db:migrate RAILS_ENV=test`
 
-### Run the app
+### Run frontend + backend together (local development)
 
-- `bin/dev`
+Use two terminals so both servers run at the same time.
+
+#### Terminal 1 (Backend: Rails API)
+
+- `bundle install`
+- `bin/rails db:prepare`
+- `bin/dev` (or `bin/rails s -p 3000`)
+
+#### Terminal 2 (Frontend: React + TypeScript)
+
+- `cd frontend`
+- `npm install`
+- `npm run dev`
+
+Frontend runs on `http://localhost:5173` and proxies `/api/*` requests to Rails at `http://localhost:3000`.
 
 ### Run tests
 
