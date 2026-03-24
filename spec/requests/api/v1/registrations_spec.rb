@@ -40,12 +40,7 @@ RSpec.describe "Api::V1::Registrations", type: :request do
 
     context "with invalid parameters" do
       it "returns 422 when email is already taken" do
-        Member.create!(
-          name: "Existing",
-          email: "newmember@example.com",
-          password: "password123",
-          password_confirmation: "password123"
-        )
+        create(:member, email: "newmember@example.com")
 
         post "/api/v1/register", params: valid_params
 

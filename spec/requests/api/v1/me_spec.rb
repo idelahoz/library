@@ -1,23 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Me", type: :request do
-  let(:member) do
-    Member.create!(
-      name: "Mario Member",
-      email: "mario@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
-  end
-
-  let(:librarian) do
-    Librarian.create!(
-      name: "Ana Librarian",
-      email: "ana@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
-  end
+  let(:member) { create(:member, email: "mario@example.com") }
+  let(:librarian) { create(:librarian, email: "ana@example.com") }
 
   describe "GET /api/v1/me" do
     context "when authenticated" do
@@ -26,10 +11,12 @@ RSpec.describe "Api::V1::Me", type: :request do
 
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
-        expect(json["id"]).to eq(member.id)
-        expect(json["email"]).to eq(member.email)
-        expect(json["name"]).to eq(member.name)
-        expect(json["role"]).to eq("Member")
+        expect(json).to include(
+          "id" => member.id,
+          "name" => member.name,
+          "email" => member.email,
+          "role" => "Member"
+        )
       end
 
       it "returns the current librarian's profile" do

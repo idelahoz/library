@@ -3,41 +3,21 @@ require "rails_helper"
 RSpec.describe User, type: :model do
   describe "validations" do
     it "is valid with a supported STI type" do
-      librarian = Librarian.new(
-        name: "Ana Librarian",
-        email: "ana@example.com",
-        password: "password123",
-        password_confirmation: "password123"
-      )
+      librarian = build(:librarian)
 
       expect(librarian).to be_valid
     end
 
     it "normalizes the email before validation" do
-      member = Member.create!(
-        name: "Mario Member",
-        email: " Mario@Example.COM ",
-        password: "password123",
-        password_confirmation: "password123"
-      )
+      member = create(:member, email: " Mario@Example.COM ")
 
       expect(member.reload.email).to eq("mario@example.com")
     end
 
     it "does not allow duplicate emails ignoring case" do
-      Librarian.create!(
-        name: "Ana Librarian",
-        email: "reader@example.com",
-        password: "password123",
-        password_confirmation: "password123"
-      )
+      create(:librarian, email: "reader@example.com")
 
-      duplicate = Member.new(
-        name: "Mario Member",
-        email: "READER@example.com",
-        password: "password123",
-        password_confirmation: "password123"
-      )
+      duplicate = build(:member, email: "READER@example.com")
 
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:email]).to include("has already been taken")
@@ -58,12 +38,7 @@ RSpec.describe User, type: :model do
 
   describe "authentication" do
     it "authenticates with the correct password" do
-      member = Member.create!(
-        name: "Mario Member",
-        email: "member@example.com",
-        password: "password123",
-        password_confirmation: "password123"
-      )
+      member = create(:member, email: "member@example.com")
 
       expect(member.authenticate("password123")).to eq(member)
       expect(member.authenticate("wrong-password")).to be(false)

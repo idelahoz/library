@@ -1,23 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Sessions", type: :request do
-  let(:librarian) do
-    Librarian.create!(
-      name: "Ana Librarian",
-      email: "ana@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
-  end
-
-  let(:member) do
-    Member.create!(
-      name: "Mario Member",
-      email: "mario@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
-  end
+  let(:librarian) { create(:librarian, email: "ana@example.com") }
+  let(:member) { create(:member, email: "mario@example.com") }
 
   describe "POST /api/v1/session" do
     context "with valid credentials" do
