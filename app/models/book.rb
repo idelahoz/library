@@ -1,4 +1,6 @@
 class Book < ApplicationRecord
+  has_many :borrowings, dependent: :destroy
+
   validates :title, :author, :genre, :isbn, presence: true
   validates :isbn, uniqueness: { case_sensitive: false }
   validates :total_copies,
@@ -23,4 +25,12 @@ class Book < ApplicationRecord
     "%#{sanitize_sql_like(value.to_s.strip)}%"
   end
   private_class_method :like_pattern
+
+  def borrowing_count
+    borrowings.active.count
+  end
+
+  def available_copies
+    total_copies - borrowing_count
+  end
 end

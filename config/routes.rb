@@ -13,6 +13,9 @@ Rails.application.routes.draw do
 
       # Books
       resources :books, only: %i[index create update destroy]
+
+      # Borrowings
+      resources :borrowings, only: %i[create]
     end
   end
 end

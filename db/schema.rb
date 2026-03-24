@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_000002) do
     t.integer "total_copies", null: false
     t.datetime "updated_at", null: false
     t.index ["isbn"], name: "index_books_on_isbn", unique: true
+  end
+
+  create_table "borrowings", force: :cascade do |t|
+    t.bigint "book_id", null: false
+    t.datetime "borrowed_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "due_at", null: false
+    t.bigint "member_id", null: false
+    t.datetime "returned_at"
+    t.datetime "updated_at", null: false
+    t.index ["book_id"], name: "index_borrowings_on_book_id"
+    t.index ["member_id", "book_id"], name: "index_borrowings_active_per_member", unique: true, where: "(returned_at IS NULL)"
+    t.index ["member_id"], name: "index_borrowings_on_member_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -47,5 +60,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_000002) do
     t.index ["type"], name: "index_users_on_type"
   end
 
+  add_foreign_key "borrowings", "books", on_delete: :cascade
+  add_foreign_key "borrowings", "users", column: "member_id", on_delete: :cascade
   add_foreign_key "sessions", "users"
 end

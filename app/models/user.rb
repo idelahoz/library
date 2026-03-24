@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_secure_password
   has_many :sessions, dependent: :destroy
+  has_many :borrowings, foreign_key: :member_id, dependent: :destroy
 
   before_validation :normalize_email
 
