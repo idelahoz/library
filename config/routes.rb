@@ -10,6 +10,9 @@ Rails.application.routes.draw do
 
       # Current user
       resource :me, only: %i[show], controller: :me
+
+      # Books
+      resources :books, only: %i[create update destroy]
     end
   end
 end
